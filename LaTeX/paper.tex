@@ -1,12 +1,12 @@
 % @Author: UnsignedByte
 % @Date:   11:12:32, 08-Dec-2020
 % @Last Modified by:   UnsignedByte
-% @Last Modified time: 00:08:37, 16-Dec-2020
+% @Last Modified time: 23:26:04, 16-Dec-2020
 
 \documentclass{article}
 \usepackage{amsmath}
 \usepackage{graphicx}
-\graphicspath{ {./images/} }
+\graphicspath{ {./images/} {../results/} }
 \usepackage[%  
     colorlinks=true,
     pdfborder={0 0 0},
@@ -28,7 +28,6 @@
 A Mixed Strategy Game within this paper refers to a subset of strategic games within game theory. A game is defined to have $P$ players and $M$ moves per player. Each player can play any one of their $M$ moves every round, and scores for each player are calculated by accessing the payoff matrix with the results of all their opponents. The payoff matrix is represented by a $P$-dimensional hypercube matrix with side length $M$. Players can be conceptualized as being arranged in a circle, each player is the first in their perspective, which increments for player to their right. Thus, player $P_i$'s' $(1\leq i\leq P)$ score is calculated by accessing the payoff matrix with the coordinates $(P_i, P_{i+1}, \cdots , P_P, P_1, P_2, \cdots , P_{i-1})$. Figure \ref{fig:1} shows an example of how payoffs could be calculated for each player. Players $1$ and $2$ make moves $P_1$ and $P_2$, respectively. Thus, the players will recieve scores $M_{<1,2>}=3$ and $M_{<2,1>}=3$, respectively.
 
 \begin{figure}[h]
-  \caption{Example $2\times2$ payoff matrix with sample moves and resulting scores.}
   	\begin{align*}
   	&\text{Payoff Matrix} &(P_1&,P_2) &\text{Payoffs}\\
 	  &M=
@@ -40,6 +39,7 @@ A Mixed Strategy Game within this paper refers to a subset of strategic games wi
 	  &(1,3)
 	  \end{align*}
   \label{fig:1}
+  \caption{Example $2\times2$ payoff matrix with sample moves and resulting scores.}
 \end{figure}
 
 \subsection{Neural Networks}
@@ -73,15 +73,61 @@ After average scores for a full generation is calculated, these scores are cubed
 Afterwards, the next generation is run on these new neural networks, consisting of the survivors from the last generation and the new cloned networks. This process repeats for a specified number of generations. Thus, as survival of the fittest is employed, the neural networks are expected to improve their strategies at the game over time.
 
 \subsubsection{Neural Networks}
+\label{subsubsection:NNs}
 
 Each neural network used will consist of three layers, an input, a hidden, and an output layer. The hidden layer is usually of length $10,$ though is sometimes $5$ for earlier and simpler input games. The output layer is of length $M,$ where each output value represents the probability that the network wants that move chosen. Thus, a random weighted choice is run with a probability distribution using this output vector, and the chosen move is selected in this manner. While another valid method is to choose the highest value as the chosen move, the use of probabilities allows neural networks to specify a distribution of moves and thus a mixed strategy for each memory state, rather than a fixed one.
 
 The input layer for each Neural Network is of size $M\cdot P \cdot l,$ where the neural networks remembers all moves in the last $l$ games (length of its memory). Each value is either a $1$ or $0$, where $1$ indicates that the move was chosen. For example, a single game with $2$ players and $2$ moves can be represented with a vector of length $4,$ where $$[1,0,0,1]$$ indicates that player $1$ (the neural network itself) played move $1,$ whereas the opponent played move $2.$ This is duplicated $l$ times, where the rightmost chunk of length $P\cdot M$ is the most recent game. If memory is empty before a certain point, which occurs when $l$ is greater than the total number of rounds played so far, all nodes will be a $0,$ as no moves have been chosen.
 
+Most importantly, neural networks \textbf{only} recieve information on moves of all players, and at no point recieve information on the number of games played, information on the neural networks, or even information regarding the number of points they recieve. Thus, the neural network is essentially blind to all information besides the moves, and never directly learn score payoffs, leaving the bulk of the learning to the natural selection process.
+
 \subsection{Procedure}
 A number of random neural networks are generated, which is specified by the total population of neural netowrks. This will be held constant across all generations. All weights and biases within this neural network are created using a normally distributed random number generator, with $\mu=0$ and $\sigma=1$. As defined in section \ref{section:DES}, these neural networks will compete with one another (and the simple agents) for a number of generations ($5000$ in most runs), and thus improve through the natural selection process. All networks are saved, along with statistics on their average point totals, and how often they played each move. Input datasets are specifically designed to challenge neural networks and look for human-like behavior.
 
 \section{Results}
+A series of tests were run on a number of mixed strategy games, and the results were saved and later analyzed. A number of interesting results arose, especially with the depth of certain strategies, even given the relatively small network sizes.
+
+\subsection{Prisoner's Dilemma}
+\begin{figure}[h]
+	\centering\includegraphics[width=4in]{1607068848885-completed/scores.png}
+  \caption{Result graphs from test matrix 1.}
+  \label{fig:1607068848885-graphs}
+\end{figure}
+
+The example shown above (Figure \ref{fig:1607068848885-graphs}) uses the payout matrix $M=
+\begin{bmatrix}
+  2 & 1\\
+  3 & 0
+\end{bmatrix}$ This is similar to the usual \textit{collaborate} vs. \textit{steal} dilemma, where stealing is the dominant strategy, but collaborating networks will out-score networks that always steal. The first graph represents the average score per round for each percentile of players, while the second graph represents a stacked representation of the distribution of each move. Area below the red line (Move 1) represents the proportion of the first move being played, while area above the red line represents the second move. Clearly, the second move is played much more often (around $80\%$ of the time) than the first.
+
+As expected, the average score per round is below $2,$ because networks often fall into a "steal" loop where, much like human players, no mutual trust is formed, and instead both networks continuously steal from one another to prevent losing. However, the relatively high score (though below $2$) is due to a slight change in the matrices: \textit{both stealing} gains both players $0$ points, whereas being \textit{stolen from} (collaborating while opponent steals) incurs a higher payout of $1$ point, eliminating the dominance of stealing as a strategy, and encouraging some collaboration.
+
+\begin{figure}[h]
+	\[\begin{array}{l r|l}
+		&\text{Memory Input} & \text{Move Probabilities} \\
+		\hline
+		1&{[1, 1, 1, 1, 1, 1]} & {[0.937, 0.063]} \\
+		2&{[0, 0, 0, 0, 0, 0]} & {[0.015, 0.985]} \\
+		3&{[1, 1, 1, 1, 1, 2]} & {[0.999, 0.001]} \\
+		4&{[1, 2, 1, 2, 1, 2]} & {[1.000, 0.000]} \\
+		5&{[1, 1, 1, 1, 2, 1]} & {[0.104, 0.896]} \\
+		6&{[2, 2, 2, 2, 2, 2]} & {[0.048, 0.952]} \\
+	\end{array}\]
+  \caption{Test cases for first dataset with memories and probability information.}
+  \label{fig:1607068848885-cases}
+\end{figure}
+
+This behavior is reflected in the neural networks' actions given certain memory states. In the above graph (Figure \ref{fig:1607068848885-cases}, selected memory states were given to the top-scoring neural network from the last generation ($5000$ in this case), and the move probabilities represents the output layer created by the network, dictating how  likely it wants each move to be played. Notably, due to the smaller size of the payoff matrix, the neural networks only have a length of $3$, where each chunk of $2$ represents the player's move and the move of their opponent, respectively. Of course, the actual memory input would be twice as large, as described in section \ref{subsubsection:NNs}.
+
+This neural network displays a level of intellect un-attainable through simpler strategies in nearly all of these cases. Firstly, in the case with $6$ ones, which represents a situation where for the last $3$ games, both players collaborated, the network acts much like a human player---it continues collaborating, despite theoretically being able to make even more profit from stealing. It is important to note, however, that this happens only $93.7\%$ of the time, showing that the neural network does have a chance, though small, of occasionally stealing.
+
+The third and fourth test cases, however, show a seemingly horrible strategy: continue collaborating if stolen from. Intuitively, one would steal when stolen from, as it prevents the opponent from gaining more points, and decreasing the player's chance of survival. This discrepancy is explained by the second case, which describes a neural network's inital move, given an empty memory (the first round). Unsurprisingly, the network cheats, but as described by the sixth test case, this would result in an infinite loop --- one where both neural nets cheat each other forever, and neither gets points. A dilemma occurs: if both players continue cheating, both will end up with $0$ points, and thus will also have $0$ chance to survive. Once again, the neural network utilizes proportions. The $4.8\%$ chance of collaborating creates a situation where considering each network plays $70$ games of $30$ rounds each, in a majority of these games one network (but rarely both) will cheat, an event which sets off a cheat-collaborate chain, and one player gets $3$ points each while the other gets $1$. This is especially obvious considering the astronomically high proportions for the third and fourth cases, suggesting that the neural network is nearly completely sure it wants to continue the situation, despite it being more advantageous to the opponent. 
+
+Such a strategy will allow neural networks to (ignoring the initial steals) be the stealer half the time, and the collaborator the other half, resulting in an average score of $2,$ equal to that of collaborating. Thus, the networks can use a stealing strategy to eliminate strategies closer to \textit{always collaborate}, while still outdoing strategies such as \textit{always steal} with a cleverly learnt behavior. What is most surprising about this behavior, however, is something that appears many times in later datasets --- neural networks adapt to outplaying simple strategies as expected, but also evolve to collaborate with one another. Such a strategy would be hard-pressed to come across within a purely competitive environment, as no player would want to be the losing one, but often times the neural networks choose a collaborative form of evolution, where networks with similar strategies evolve to work together and keep their "species" dominant, rather than competing simply for self gain.
+
+\subsection{Matching and Mismatching}
+
+
 
 \section{Discussion}
 
