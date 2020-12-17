@@ -2,7 +2,7 @@
 # @Author: UnsignedByte
 # @Date:	 22:05:55, 02-Dec-2020
 # @Last Modified by:   UnsignedByte
-# @Last Modified time: 14:01:05, 07-Dec-2020
+# @Last Modified time: 23:30:33, 16-Dec-2020
 
 import numpy as np
 import utils
@@ -158,10 +158,10 @@ class Brain:
 		return l; # return chosen choice
 	def reproduce(self):
 		self.age+=1;
-		if np.random.sample() < random_chance:
+		if np.random.sample() < random_chance: # Create a completely random network
 			return Brain.random(self.shape);
 		return Brain(
 					self.shape,
-					[np.vectorize(lambda x:mutateNode(x))(self.biases[i]) for i in range(len(self.shape)-1)],
-					[np.vectorize(lambda x:mutateNode(x))(self.weights[i]) for i in range(len(self.shape)-1)]
+					[np.vectorize(lambda x:mutateNode(x))(self.biases[i]) for i in range(len(self.shape)-1)], # Mutate biases
+					[np.vectorize(lambda x:mutateNode(x))(self.weights[i]) for i in range(len(self.shape)-1)] # Mutate weights
 				)

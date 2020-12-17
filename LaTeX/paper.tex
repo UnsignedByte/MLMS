@@ -1,7 +1,7 @@
 % @Author: UnsignedByte
 % @Date:   11:12:32, 08-Dec-2020
 % @Last Modified by:   UnsignedByte
-% @Last Modified time: 23:26:04, 16-Dec-2020
+% @Last Modified time: 00:09:16, 17-Dec-2020
 
 \documentclass{article}
 \usepackage{amsmath}
@@ -100,7 +100,7 @@ The example shown above (Figure \ref{fig:1607068848885-graphs}) uses the payout 
   3 & 0
 \end{bmatrix}$ This is similar to the usual \textit{collaborate} vs. \textit{steal} dilemma, where stealing is the dominant strategy, but collaborating networks will out-score networks that always steal. The first graph represents the average score per round for each percentile of players, while the second graph represents a stacked representation of the distribution of each move. Area below the red line (Move 1) represents the proportion of the first move being played, while area above the red line represents the second move. Clearly, the second move is played much more often (around $80\%$ of the time) than the first.
 
-As expected, the average score per round is below $2,$ because networks often fall into a "steal" loop where, much like human players, no mutual trust is formed, and instead both networks continuously steal from one another to prevent losing. However, the relatively high score (though below $2$) is due to a slight change in the matrices: \textit{both stealing} gains both players $0$ points, whereas being \textit{stolen from} (collaborating while opponent steals) incurs a higher payout of $1$ point, eliminating the dominance of stealing as a strategy, and encouraging some collaboration.
+As expected, the average score per round is below $2,$ because networks often fall into a "steal" loop where, much like human players, no mutual trust is formed, and instead both networks continuously steal from one another to prevent losing. However, the relatively high score (though below $2$) is due to a slight change in the matrices: \textit{both stealing} gains both players $0$ points, whereas being \textit{stolen from} (collaborating while opponent steals) incurs a higher payout of $1$ point, eliminating the dominance of stealing as a strategy, and encouraging some collaboration. The lack of significant change in move distribution and scores beyond the first few generations is also notable; it represents the fact that the neural networks reached near a local maximum score-optimizing strategy, one that remained undefeated for the duration of all $5000$ generations.
 
 \begin{figure}[h]
 	\[\begin{array}{l r|l}
@@ -127,8 +127,12 @@ Such a strategy will allow neural networks to (ignoring the initial steals) be t
 
 \subsection{Matching and Mismatching}
 
-
+TBD.
 
 \section{Discussion}
+
+All in all, the experiments discussed within this paper were a resounding success. Despite initial setbacks regarding network design and processing power constraints, most issues were resolved through redesigning, code optimization, and multithreading over the first few days of experimentation. The neural networks achieved an unexpected level of complexity given their small size, and managed to optimize their strategies far beyond what was initially expected.
+
+Despite the successes of these experiments, however, the project definitely was constrained in a number of ways, most of which can be attributed to the lack of time. Simulations take processing power, and processing time; despite using multithreading and math optimization, 5000 generations often took an average of $12$ hours, given that (on average) each test contained $100$ neural networks, each playing around $60$ games, with $40$ rounds each, adding up to a whopping $240,000$ games per generation, including calculating moves for each player each round, and adding score totals, and eventually selecting survivors and reproducing. Naturally, only a limited number of tests were able to be run, and room for later re-testing was limited. Given more time, larger neural networks could be run containing more nodes and hidden layers, a larger population of networks could be used to allow for greater diversity in strategy, and more games could be played each generation. Furthermore, more complicated payoff matrices could be designed, containing more than four moves and maybe even more than three players. These could be more thoroughly human-tested to compare human strategies with those devised by the networks. Data analysis was similarly restricted; more time could allow for exploration of how neural networks fared against human opponents, observations into how exactly the neural networks managed to devise such complex behavior through analyzing weights, and more. All in all, this project, though successful, can still be taken much further than it was in this short period, and much deeper analysis could be performed on the resultant data.
 
 \end{document}

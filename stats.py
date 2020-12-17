@@ -2,7 +2,7 @@
 # @Author: UnsignedByte
 # @Date:   09:39:42, 04-Dec-2020
 # @Last Modified by:   UnsignedByte
-# @Last Modified time: 23:01:05, 16-Dec-2020
+# @Last Modified time: 23:44:45, 16-Dec-2020
 
 import numpy as np
 import utils
@@ -56,8 +56,8 @@ for name in names:
 			if os.path.isfile(os.path.join(fpath, 'test.txt')):
 				with open(os.path.join(fpath, 'test.txt')) as f:
 					for x in f.readlines():
-						print(list(map(int, x.split())))
 						brain.testCase(nets[-1], list(map(int, x.split())))
+			print(sum(x.age for x in nets)/netCount)
 
 
 		if i%100==0:
